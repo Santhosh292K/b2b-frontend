@@ -147,19 +147,36 @@ export default function PatientChatPage() {
             <RoleGuard allowedRoles={['patient']}>
                 <div className="min-h-screen bg-slate-50 pt-16">
                     <div className="h-[calc(100vh-4rem)] flex">
-                        {/* Sidebar */}
-                        <div className={`${showSidebar ? 'w-80' : 'w-0'} transition-all duration-300 bg-white border-r border-slate-200 flex flex-col overflow-hidden`}>
+                        {/* Mobile Overlay Backdrop */}
+                        {showSidebar && (
+                            <div
+                                className="fixed inset-0 bg-black/50 z-40 sm:hidden"
+                                onClick={() => setShowSidebar(false)}
+                            />
+                        )}
+                        {/* Sidebar - Overlay on mobile */}
+                        <div className={`${showSidebar ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'} fixed sm:relative inset-y-0 left-0 w-80 sm:w-80 z-50 sm:z-auto transform sm:transform-none transition-transform duration-300 bg-white border-r border-slate-200 flex flex-col pt-16 sm:pt-0 ${!showSidebar && 'sm:hidden'}`}>
                             <div className="p-4 border-b border-slate-200 flex items-center justify-between">
                                 <h2 className="font-semibold text-slate-800">Chat History</h2>
-                                <button
-                                    onClick={createNewSession}
-                                    className="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-                                    title="New Chat"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={createNewSession}
+                                        className="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                                        title="New Chat"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        onClick={() => setShowSidebar(false)}
+                                        className="p-2 rounded-lg hover:bg-slate-100 transition-colors sm:hidden"
+                                    >
+                                        <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div className="flex-1 overflow-y-auto p-2 space-y-1">
                                 {isLoading ? (
