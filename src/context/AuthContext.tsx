@@ -43,6 +43,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, []);
 
     useEffect(() => {
+        // Check for specific OAuth errors in URL
+        const params = new URLSearchParams(window.location.search);
+        const errorParam = params.get('error');
+        if (errorParam === 'oauth_failed') {
+            setError('Google authentication failed. Please try again.');
+        }
+
         checkAuth();
     }, [checkAuth]);
 

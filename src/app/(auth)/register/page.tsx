@@ -12,8 +12,15 @@ export default function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
-    const { register, isAuthenticated, isLoading } = useAuth();
+    const { register, isAuthenticated, isLoading, error: authError, clearError } = useAuth();
     const router = useRouter();
+
+    // Clear auth errors when component unmounts
+    useEffect(() => {
+        return () => {
+            if (authError) clearError();
+        };
+    }, [clearError, authError]);
 
     // Redirect if already authenticated - use useEffect to prevent render loops
     useEffect(() => {
@@ -94,12 +101,12 @@ export default function RegisterPage() {
                         <p className="text-slate-500 mt-2 text-sm">Join us and start your journey</p>
                     </div>
 
-                    {error && (
+                    {(error || authError) && (
                         <div className="mb-5 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm flex items-center gap-3">
                             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            {error}
+                            {error || authError}
                         </div>
                     )}
 
