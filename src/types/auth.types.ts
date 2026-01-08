@@ -2,6 +2,7 @@ export interface User {
     _id: string;
     name: string;
     email: string;
+    role: 'doctor' | 'patient';
     isActive: boolean;
     lastLogin?: string;
     createdAt: string;
@@ -25,6 +26,7 @@ export interface RegisterCredentials {
     name: string;
     email: string;
     password: string;
+    role: 'doctor' | 'patient';
 }
 
 export interface ApiError {

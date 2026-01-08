@@ -1,4 +1,11 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import {
+    CreateVisitData,
+    VisitListResponse,
+    PatientListResponse,
+    VisitDetailResponse,
+    AISearchResponse,
+} from '@/types/clinical.types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -93,4 +100,42 @@ export const authApi = {
     getMe: () => api.get('/api/auth/me'),
 
     logoutAll: () => api.post('/api/auth/logout-all'),
+};
+
+// Clinical Visit API functions
+export const visitApi = {
+    // Get visits for the authenticated patient
+    getVisits: () => api.get<VisitListResponse>('/api/patient/visits'),
+
+    // Get all visits created by doctor
+    getDoctorVisits: () => api.get<VisitListResponse>('/api/doctor/visits'),
+
+    // Get single visit by ID
+    getVisitById: (visitId: string) =>
+        api.get<VisitDetailResponse>(`/api/visit-summary/${visitId}`),
+
+    // Create a new visit (doctor only)
+    createVisit: (data: CreateVisitData) =>
+        api.post<VisitDetailResponse>('/api/visit-summary', {
+            patientId: data.patientId,
+            visitDate: data.visitDate,
+            summaryText: data.summary,
+        }),
+
+    // Get list of assigned patients (doctor only)
+    getPatients: () => api.get<PatientListResponse>('/api/doctor/patients'),
+
+    // Get list of all doctors (patient only)
+    getDoctors: () => api.get<{ success: boolean; data: { doctors: { _id: string; name: string; email: string; patientCount: number }[]; total: number } }>('/api/doctors'),
+
+    // Assign patient to a doctor (patient only)
+    assignDoctor: (doctorId: string) =>
+        api.post('/api/patient/assign-doctor', { doctorId }),
+
+    // AI Search through visit summaries (doctor only)
+    searchSummaries: (query: string, patientId?: string) =>
+        api.post<AISearchResponse>('/api/ai/retrieve-summary', {
+            patientId,
+            query,
+        }),
 };
