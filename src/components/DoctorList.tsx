@@ -25,6 +25,7 @@ export default function DoctorList({ onDoctorSelected, currentDoctorId }: Doctor
         const fetchDoctors = async () => {
             try {
                 const response = await visitApi.getDoctors();
+                console.log('Fetched doctors:', response);
                 if (response.data.success) {
                     setDoctors(response.data.data.doctors);
                 }

@@ -7,7 +7,7 @@ import {
     AISearchResponse,
 } from '@/types/clinical.types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Create axios instance
 const api = axios.create({
@@ -44,16 +44,13 @@ api.interceptors.response.use(
             _retry?: boolean;
         };
 
-        // If error is 401 and we haven't retried yet
         if (
             error.response?.status === 401 &&
             !originalRequest._retry &&
             originalRequest.url !== '/api/auth/refresh' &&
-            originalRequest.url !== '/api/auth/login' &&
-            originalRequest.url !== '/api/auth/me'
+            originalRequest.url !== '/api/auth/login'
         ) {
             if (isRefreshing) {
-                // If already refreshing, queue this request
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
@@ -65,14 +62,11 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                // Attempt to refresh token
                 await api.post('/api/auth/refresh');
                 processQueue(null);
                 return api(originalRequest);
             } catch (refreshError) {
                 processQueue(refreshError as AxiosError);
-                // Don't redirect here - let the AuthContext handle it
-                // This prevents infinite reload loops
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;
