@@ -1,0 +1,120 @@
+'use client';
+
+import AuthGuard from '@/components/AuthGuard';
+import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { visitApi } from '@/lib/api';
+import { Visit } from '@/types/clinical.types';
+
+export default function SummariesPage() {
+    const { user } = useAuth();
+    const [visits, setVisits] = useState<Visit[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchVisits = async () => {
+            try {
+                const response = await visitApi.getDoctorVisits();
+                if (response.data.success) {
+                    setVisits(response.data.data.visits);
+                }
+            } catch (err) {
+                console.error('Error fetching visits:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchVisits();
+    }, []);
+
+    return (
+        <AuthGuard>
+            <div className="min-h-screen bg-slate-50">
+                <div className="pt-20 px-4 sm:px-6 lg:px-8 pb-12">
+                    <div className="max-w-4xl mx-auto">
+                        {/* Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                            <div>
+                                <h1 className="text-2xl font-bold text-slate-800">Visit Summaries</h1>
+                                <p className="text-slate-500 mt-1">
+                                    {visits.length} summar{visits.length !== 1 ? 'ies' : 'y'} created
+                                </p>
+                            </div>
+                            <Link
+                                href="/create-visit"
+                                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-violet-600 text-white font-medium hover:bg-violet-700 transition-colors shadow-md"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Create Summary
+                            </Link>
+                        </div>
+
+                        {/* Summaries List */}
+                        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                            {isLoading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <div className="w-8 h-8 border-3 border-violet-600 border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            ) : visits.length === 0 ? (
+                                <div className="p-12 text-center">
+                                    <svg className="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                    </svg>
+                                    <h3 className="text-lg font-semibold text-slate-800 mb-1">No summaries yet</h3>
+                                    <p className="text-slate-500 mb-4">Create your first visit summary to get started</p>
+                                    <Link
+                                        href="/create-visit"
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg font-medium hover:bg-violet-700"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Create Summary
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-slate-100">
+                                    {visits.map((visit) => (
+                                        <Link
+                                            key={visit._id}
+                                            href={`/visit/${visit._id}`}
+                                            className="flex items-center justify-between p-5 hover:bg-slate-50 transition-colors group"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                                    {visit.patientName?.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-slate-800">{visit.patientName}</p>
+                                                    <p className="text-sm text-slate-500">
+                                                        Visit: {new Date(visit.visitDate).toLocaleDateString('en-US', {
+                                                            month: 'long',
+                                                            day: 'numeric',
+                                                            year: 'numeric',
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-xs text-slate-400">
+                                                    Created {new Date(visit.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                </span>
+                                                <svg className="w-5 h-5 text-slate-400 group-hover:text-violet-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </AuthGuard>
+    );
+}
