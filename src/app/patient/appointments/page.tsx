@@ -169,15 +169,19 @@ export default function MyAppointmentsPage() {
                                                         {appointment.doctorName?.charAt(0).toUpperCase() || 'D'}
                                                     </div>
                                                 </div>
-                                                <h3 className="font-semibold text-lg text-slate-800 mb-2">Dr. {appointment.doctorName}</h3>
-                                                <p className="text-sm text-slate-500 mb-3">
-                                                    {new Date(appointment.requestedDate).toLocaleDateString('en-US', {
-                                                        weekday: 'short',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                        year: 'numeric',
-                                                    })}
-                                                </p>
+
+                                                {/* Doctor Info */}
+                                                <div className="flex-1">
+                                                    <h3 className="font-semibold text-lg text-slate-800">Dr. {appointment.doctorName}</h3>
+                                                    <p className="text-sm text-slate-500">
+                                                        {new Date(appointment.requestedDate).toLocaleDateString('en-US', {
+                                                            weekday: 'short',
+                                                            month: 'long',
+                                                            day: 'numeric',
+                                                            year: 'numeric',
+                                                        })}
+                                                    </p>
+                                                </div>
 
                                                 {/* Status Badge */}
                                                 <div className="flex-shrink-0">
@@ -188,20 +192,23 @@ export default function MyAppointmentsPage() {
                                                 </div>
                                             </div>
 
-                                                {appointment.message && (
-                                                    <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-100 w-full line-clamp-2 mb-3">
-                                                        {appointment.message}
-                                                    </p>
-                                                )}
+                                            {/* Message */}
+                                            {appointment.message && (
+                                                <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-100 w-full line-clamp-2 mb-3 mt-3">
+                                                    {appointment.message}
+                                                </p>
+                                            )}
 
-                                                {appointment.status === 'accepted' && (
+                                            {/* Video Call Button */}
+                                            {appointment.status === 'accepted' && (
+                                                <div className="mt-3">
                                                     <StartVideoCallButton
                                                         appointmentId={appointment._id}
                                                         status={appointment.status}
                                                         className="w-full text-sm"
                                                     />
-                                                )}
-                                            </div>
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
