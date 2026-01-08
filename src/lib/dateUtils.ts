@@ -6,10 +6,25 @@
 const IST_TIMEZONE = 'Asia/Kolkata';
 
 /**
+ * Parse a date string properly - handles YYYY-MM-DD as local date, not UTC
+ */
+const parseDate = (dateString: string | Date): Date => {
+    if (dateString instanceof Date) return dateString;
+
+    // If it's a date-only string (YYYY-MM-DD), parse as local date to avoid timezone shift
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        const [year, month, day] = dateString.split('-').map(Number);
+        return new Date(year, month - 1, day); // Local date
+    }
+
+    return new Date(dateString);
+};
+
+/**
  * Format date to IST with full date details
  */
 export const formatDateIST = (dateString: string | Date, options?: Intl.DateTimeFormatOptions): string => {
-    const date = new Date(dateString);
+    const date = parseDate(dateString);
     const defaultOptions: Intl.DateTimeFormatOptions = {
         timeZone: IST_TIMEZONE,
         weekday: 'short',
@@ -24,7 +39,7 @@ export const formatDateIST = (dateString: string | Date, options?: Intl.DateTime
  * Format date to IST - short format (e.g., "Jan 8")
  */
 export const formatDateShortIST = (dateString: string | Date): string => {
-    const date = new Date(dateString);
+    const date = parseDate(dateString);
     return date.toLocaleDateString('en-IN', {
         timeZone: IST_TIMEZONE,
         month: 'short',
@@ -49,7 +64,7 @@ export const formatTimeIST = (dateString: string | Date): string => {
  * Format date and time to IST
  */
 export const formatDateTimeIST = (dateString: string | Date): string => {
-    const date = new Date(dateString);
+    const date = parseDate(dateString);
     return date.toLocaleString('en-IN', {
         timeZone: IST_TIMEZONE,
         weekday: 'short',
