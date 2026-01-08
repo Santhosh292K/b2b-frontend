@@ -110,6 +110,30 @@ export default function DoctorAppointmentsPage() {
                                 </Link>
                             </div>
 
+                            {/* Stats */}
+                            {!isLoading && !error && appointments.length > 0 && (
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                                        <p className="text-2xl font-bold text-amber-600">
+                                            {appointments.filter(a => a.status === 'pending').length}
+                                        </p>
+                                        <p className="text-sm text-slate-500">Pending</p>
+                                    </div>
+                                    <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                                        <p className="text-2xl font-bold text-green-600">
+                                            {appointments.filter(a => a.status === 'accepted').length}
+                                        </p>
+                                        <p className="text-sm text-slate-500">Accepted</p>
+                                    </div>
+                                    <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                                        <p className="text-2xl font-bold text-red-600">
+                                            {appointments.filter(a => a.status === 'rejected').length}
+                                        </p>
+                                        <p className="text-sm text-slate-500">Rejected</p>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Filter Tabs */}
                             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-1.5 flex gap-1">
                                 {(['pending', 'accepted', 'rejected', 'all'] as const).map((tab) => (

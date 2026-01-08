@@ -98,29 +98,29 @@ export default function DoctorsPage() {
                                     {filteredDoctors.map((doctor) => (
                                         <div
                                             key={doctor._id}
-                                            className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 hover:shadow-lg hover:-translate-y-1 hover:border-violet-300 transition-all duration-200 group"
+                                            className="bg-white rounded-xl border border-slate-200 shadow-sm p-10 hover:shadow-lg hover:-translate-y-1 hover:border-violet-300 transition-all duration-200 group"
                                         >
                                             <div className="flex flex-col items-center text-center">
-                                                <div className="w-20 h-20 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center text-white font-bold text-2xl mb-4 group-hover:scale-110 transition-transform duration-200">
+                                                <div className="w-36 h-36 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center text-white font-bold text-4xl mb-6 group-hover:scale-110 transition-transform duration-200">
                                                     {doctor.name.charAt(0).toUpperCase()}
                                                 </div>
-                                                <h3 className="font-semibold text-lg text-slate-800 mb-2">Dr. {doctor.name}</h3>
+                                                <h3 className="font-semibold text-2xl text-slate-800 mb-3">Dr. {doctor.name}</h3>
                                                 {doctor.specialization && (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mb-3">
+                                                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-700 mb-4">
                                                         {doctor.specialization}
                                                     </span>
                                                 )}
-                                                <p className="text-sm text-slate-500 mb-2">{doctor.email}</p>
-                                                <p className="text-xs text-slate-400 mb-4">
+                                                <p className="text-base text-slate-500 mb-3">{doctor.email}</p>
+                                                <p className="text-sm text-slate-400 mb-6">
                                                     {doctor.patientCount} patient{doctor.patientCount !== 1 ? 's' : ''}
                                                 </p>
 
                                                 <a
                                                     href={`mailto:${doctor.email}`}
-                                                    className="w-full py-2 px-4 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
+                                                    className="w-full py-3 px-5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors flex items-center justify-center gap-2 font-medium text-base"
                                                     title="Email doctor"
                                                 >
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                                     </svg>
                                                     Email Doctor

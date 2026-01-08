@@ -92,6 +92,30 @@ export default function MyAppointmentsPage() {
                             </Link>
                         </div>
 
+                        {/* Stats */}
+                        {!isLoading && !error && appointments.length > 0 && (
+                            <div className="grid grid-cols-3 gap-4 mb-6">
+                                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                                    <p className="text-2xl font-bold text-amber-600">
+                                        {appointments.filter(a => a.status === 'pending').length}
+                                    </p>
+                                    <p className="text-sm text-slate-500">Pending</p>
+                                </div>
+                                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                                    <p className="text-2xl font-bold text-green-600">
+                                        {appointments.filter(a => a.status === 'accepted').length}
+                                    </p>
+                                    <p className="text-sm text-slate-500">Accepted</p>
+                                </div>
+                                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                                    <p className="text-2xl font-bold text-red-600">
+                                        {appointments.filter(a => a.status === 'rejected').length}
+                                    </p>
+                                    <p className="text-sm text-slate-500">Rejected</p>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Appointments List */}
                         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                             {isLoading ? (
@@ -131,66 +155,57 @@ export default function MyAppointmentsPage() {
                                     </Link>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                                <div className="divide-y divide-slate-100">
                                     {appointments.map((appointment) => (
                                         <div
                                             key={appointment._id}
-                                            className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                                            className="px-6 py-5 hover:bg-slate-50 transition-colors duration-150 group"
                                         >
-                                            <div className="flex flex-col items-center text-center">
-                                                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4">
-                                                    {appointment.doctorName?.charAt(0).toUpperCase() || 'D'}
+                                            <div className="flex items-center gap-4">
+                                                {/* Doctor Avatar */}
+                                                <div className="flex-shrink-0">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                                                        {appointment.doctorName?.charAt(0).toUpperCase() || 'D'}
+                                                    </div>
                                                 </div>
-                                                <h3 className="font-semibold text-lg text-slate-800 mb-2">Dr. {appointment.doctorName}</h3>
-                                                <p className="text-sm text-slate-500 mb-3">
-                                                    {new Date(appointment.requestedDate).toLocaleDateString('en-US', {
-                                                        weekday: 'short',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                        year: 'numeric',
-                                                    })}
-                                                </p>
 
-                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium capitalize mb-4 ${getStatusColor(appointment.status)}`}>
-                                                    {getStatusIcon(appointment.status)}
-                                                    {appointment.status}
-                                                </span>
+                                                {/* Doctor Info */}
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-semibold text-slate-800 text-base group-hover:text-violet-600 transition-colors">
+                                                        Dr. {appointment.doctorName}
+                                                    </h3>
+                                                    <p className="text-sm text-slate-500 mt-0.5">
+                                                        {new Date(appointment.requestedDate).toLocaleDateString('en-US', {
+                                                            weekday: 'short',
+                                                            month: 'long',
+                                                            day: 'numeric',
+                                                            year: 'numeric',
+                                                        })}
+                                                    </p>
+                                                </div>
 
-                                                {appointment.message && (
-                                                    <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-100 w-full line-clamp-2">
+                                                {/* Status Badge */}
+                                                <div className="flex-shrink-0">
+                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium capitalize ${getStatusColor(appointment.status)}`}>
+                                                        {getStatusIcon(appointment.status)}
+                                                        {appointment.status}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Message */}
+                                            {appointment.message && (
+                                                <div className="mt-3 ml-16">
+                                                    <p className="text-sm text-slate-600 bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-100">
                                                         {appointment.message}
                                                     </p>
-                                                )}
-                                            </div>
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
                             )}
                         </div>
-
-                        {/* Stats */}
-                        {!isLoading && !error && appointments.length > 0 && (
-                            <div className="mt-6 grid grid-cols-3 gap-4">
-                                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-                                    <p className="text-2xl font-bold text-amber-600">
-                                        {appointments.filter(a => a.status === 'pending').length}
-                                    </p>
-                                    <p className="text-sm text-slate-500">Pending</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-                                    <p className="text-2xl font-bold text-green-600">
-                                        {appointments.filter(a => a.status === 'accepted').length}
-                                    </p>
-                                    <p className="text-sm text-slate-500">Accepted</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-                                    <p className="text-2xl font-bold text-red-600">
-                                        {appointments.filter(a => a.status === 'rejected').length}
-                                    </p>
-                                    <p className="text-sm text-slate-500">Rejected</p>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

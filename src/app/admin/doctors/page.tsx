@@ -25,6 +25,8 @@ export default function AdminDoctorsPage() {
     const [showAddForm, setShowAddForm] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [greeting, setGreeting] = useState('');
+    const [todayStr, setTodayStr] = useState('');
 
     // Form state
     const [formData, setFormData] = useState({
@@ -104,20 +106,7 @@ export default function AdminDoctorsPage() {
         }
     };
 
-    // Get greeting based on time
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour < 12) return 'Good Morning';
-        if (hour < 17) return 'Good Afternoon';
-        return 'Good Evening';
-    };
 
-    const todayStr = new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-    });
 
     if (user?.role !== 'admin') {
         return (
@@ -144,7 +133,7 @@ export default function AdminDoctorsPage() {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
                                 <h1 className="text-2xl font-bold text-slate-800">
-                                    {getGreeting()}, {user?.name?.split(' ')[0]}
+                                    {greeting && `${greeting}, `}{user?.name?.split(' ')[0]}
                                 </h1>
                                 <p className="text-slate-500">{todayStr}</p>
                             </div>

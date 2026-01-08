@@ -123,29 +123,29 @@ export default function DoctorPatientsPage() {
                                         <Link
                                             key={patient._id}
                                             href={`/doctor/patients/${patient._id}`}
-                                            className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 hover:shadow-md hover:border-blue-200 transition-all group"
+                                            className="bg-white rounded-xl border border-slate-200 shadow-sm p-10 hover:shadow-md hover:border-blue-200 transition-all group"
                                         >
-                                            <div className="flex items-start gap-4">
-                                                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0 group-hover:scale-105 transition-transform">
+                                            <div className="flex items-start gap-6">
+                                                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-3xl flex-shrink-0 group-hover:scale-105 transition-transform">
                                                     {patient.name.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <h3 className="font-semibold text-slate-800 truncate group-hover:text-blue-600 transition-colors">
+                                                    <h3 className="font-semibold text-xl text-slate-800 truncate group-hover:text-blue-600 transition-colors">
                                                         {patient.name}
                                                     </h3>
-                                                    <p className="text-sm text-slate-500 truncate">
+                                                    <p className="text-base text-slate-500 truncate mt-1">
                                                         {patient.email}
                                                     </p>
-                                                    <div className="flex items-center gap-4 mt-3">
-                                                        <span className="text-sm text-slate-600 flex items-center gap-1.5">
-                                                            <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <div className="flex items-center gap-4 mt-4">
+                                                        <span className="text-base text-slate-600 flex items-center gap-2">
+                                                            <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                             </svg>
                                                             {patient.totalVisits} visit{patient.totalVisits !== 1 ? 's' : ''}
                                                         </span>
                                                     </div>
                                                     {patient.lastVisit && (
-                                                        <p className="text-xs text-slate-400 mt-2">
+                                                        <p className="text-sm text-slate-400 mt-3">
                                                             Last visit: {new Date(patient.lastVisit).toLocaleDateString('en-US', {
                                                                 month: 'short',
                                                                 day: 'numeric',
@@ -155,11 +155,11 @@ export default function DoctorPatientsPage() {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-                                                <span className="text-sm text-blue-600 font-medium group-hover:text-blue-700">
+                                            <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-between">
+                                                <span className="text-base text-blue-600 font-medium group-hover:text-blue-700">
                                                     View Timeline
                                                 </span>
-                                                <svg className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-6 h-6 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                                 </svg>
                                             </div>
