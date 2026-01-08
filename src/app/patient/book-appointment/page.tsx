@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { visitApi, appointmentApi } from '@/lib/api';
+import { getTomorrowDateIST } from '@/lib/dateUtils';
 import AuthGuard from '@/components/AuthGuard';
 import RoleGuard from '@/components/RoleGuard';
 import Link from 'next/link';
@@ -46,10 +47,8 @@ export default function BookAppointmentPage() {
 
         fetchDoctors();
 
-        // Set default date to tomorrow
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        setRequestedDate(tomorrow.toISOString().split('T')[0]);
+        // Set default date to tomorrow (IST)
+        setRequestedDate(getTomorrowDateIST());
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
