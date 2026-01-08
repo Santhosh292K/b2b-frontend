@@ -7,7 +7,7 @@ import {
     AISearchResponse,
 } from "@/types/clinical.types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!process.env.NEXT_PUBLIC_API_URL) {
     console.warn("NEXT_PUBLIC_API_URL is not set, using default:", API_BASE_URL);
@@ -101,7 +101,13 @@ export const authApi = {
 
     getMe: () => api.get("/api/auth/me"),
 
-    logoutAll: () => api.post("/api/auth/logout-all"),
+  logoutAll: () => api.post("/api/auth/logout-all"),
+
+  updateProfile: (data: { name: string; email: string }) =>
+    api.put("/api/auth/profile", data),
+
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    api.put("/api/auth/change-password", data),
 };
 
 // Clinical Visit API functions
@@ -228,6 +234,87 @@ export const appointmentApi = {
         api.get<{ success: boolean; data: { count: number } }>(
             "/api/appointments/doctor/count"
         ),
+};
+export const medicalHistoryApi = {
+  getMedicalHistory: (patientId?: string) =>
+    api.get("/api/medical-history", { params: { patientId } }),
+
+  addMedicalHistoryEvent: (data: {
+    patientId: string;
+    condition: {
+      name: string;
+      type: string;
+      severity: string;
+      description?: string;
+    };
+    diagnosedOn: string;
+    diagnosedBy?: {
+      doctorId: string;
+      doctorName: string;
+      hospital?: string;
+    };
+    affectedBodyPart?: string;
+    treatments?: Array<{
+      treatmentId: string;
+      type: string;
+      details: Record<string, string>;
+      startedOn: string;
+      endedOn?: string;
+    }>;
+    followUps?: Array<{
+      date: string;
+      notes: string;
+      nextVisit?: string;
+    }>;
+    status?: string;
+    documents?: Array<{
+      type: string;
+      url: string;
+    }>;
+  }) => api.post("/api/medical-history", data),
+
+  updateMedicalHistoryEvent: (
+    eventId: string,
+    data: {
+      patientId: string;
+      condition?: {
+        name: string;
+        type: string;
+        severity: string;
+        description?: string;
+      };
+      diagnosedOn?: string;
+      diagnosedBy?: {
+        doctorId: string;
+        doctorName: string;
+        hospital?: string;
+      };
+      affectedBodyPart?: string;
+      treatments?: Array<{
+        treatmentId: string;
+        type: string;
+        details: Record<string, string>;
+        startedOn: string;
+        endedOn?: string;
+      }>;
+      followUps?: Array<{
+        date: string;
+        notes: string;
+        nextVisit?: string;
+      }>;
+      status?: string;
+      documents?: Array<{
+        type: string;
+        url: string;
+      }>;
+    }
+  ) => api.put(`/api/medical-history/${eventId}`, data),
+
+  deleteMedicalHistoryEvent: (eventId: string, patientId: string) =>
+    api.delete(`/api/medical-history/${eventId}`, { data: { patientId } }),
+
+  getMedicalHistoryEvent: (eventId: string, patientId?: string) =>
+    api.get(`/api/medical-history/${eventId}`, { params: { patientId } }),
 };
 
 // Chat session types
