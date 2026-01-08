@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { appointmentApi } from '@/lib/api';
 import { formatDateIST, formatTime12Hour } from '@/lib/dateUtils';
 import AuthGuard from '@/components/AuthGuard';
@@ -29,11 +29,7 @@ export default function DoctorAppointmentsPage() {
     const [processingId, setProcessingId] = useState<string | null>(null);
     const [filter, setFilter] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('pending');
 
-    useEffect(() => {
-        fetchAppointments();
-    }, [filter]);
-
-    const fetchAppointments = async () => {
+    const fetchAppointments = useCallback(async () => {
         try {
             setIsLoading(true);
             const status = filter === 'all' ? undefined : filter;
@@ -47,7 +43,11 @@ export default function DoctorAppointmentsPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [filter]);
+
+    useEffect(() => {
+        fetchAppointments();
+    }, [fetchAppointments]);
 
     const handleAccept = async (id: string) => {
         setProcessingId(id);

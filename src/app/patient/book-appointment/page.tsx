@@ -54,8 +54,8 @@ export default function BookAppointmentPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!selectedDoctor || !requestedDate) {
-            setError('Please select a doctor and date');
+        if (!selectedDoctor || !requestedDate || !requestedTime) {
+            setError('Please select a doctor, date, and time');
             return;
         }
 
@@ -64,17 +64,8 @@ export default function BookAppointmentPage() {
 
         try {
             // Combine date and time into a proper DateTime
-            let appointmentDateTime;
-            if (requestedTime) {
-                // Combine date and time: "2026-01-08" + "14:30" = "2026-01-08T14:30"
-                appointmentDateTime = `${requestedDate}T${requestedTime}:00`;
-            } else {
-                // If no time provided, use current time
-                const now = new Date();
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                appointmentDateTime = `${requestedDate}T${hours}:${minutes}:00`;
-            }
+            // Format: "2026-01-08" + "14:30" = "2026-01-08T14:30:00"
+            const appointmentDateTime = `${requestedDate}T${requestedTime}:00`;
 
             await appointmentApi.createAppointment(selectedDoctor, appointmentDateTime, requestedTime, message);
             setSuccessMessage('Appointment request sent successfully!');
@@ -238,12 +229,13 @@ export default function BookAppointmentPage() {
                                 {/* Time Selection */}
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Preferred Time (Optional)
+                                        Preferred Time *
                                     </label>
                                     <input
                                         type="time"
                                         value={requestedTime}
                                         onChange={(e) => setRequestedTime(e.target.value)}
+                                        required
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                     />
                                 </div>
@@ -269,7 +261,7 @@ export default function BookAppointmentPage() {
                                 {/* Submit Button */}
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting || !selectedDoctor || !requestedDate}
+                                    disabled={isSubmitting || !selectedDoctor || !requestedDate || !requestedTime}
                                     className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {isSubmitting ? (
