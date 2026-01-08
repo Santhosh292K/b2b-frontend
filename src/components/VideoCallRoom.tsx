@@ -31,76 +31,149 @@ export default function VideoCallRoom({
     const localVideoTrackRef = useRef<ICameraVideoTrack | null>(null);
     const localAudioTrackRef = useRef<IMicrophoneAudioTrack | null>(null);
     const localVideoRef = useRef<HTMLDivElement>(null);
+    const isMountedRef = useRef(true);
 
     useEffect(() => {
+        let isInitializing = true;
+
         const init = async () => {
-            // Create Agora client
-            const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-            clientRef.current = client;
+            try {
+                console.log('🎥 Initializing video call...');
+                console.log('📍 Channel:', channelName);
+                console.log('👤 User ID:', uid);
+                console.log('🔑 App ID:', appId);
 
-            // Event handlers
-            client.on('user-published', async (user, mediaType) => {
-                await client.subscribe(user, mediaType);
+                // Create Agora client
+                const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+                clientRef.current = client;
 
-                if (mediaType === 'video') {
-                    setRemoteUsers((prev) => {
-                        if (!prev.includes(user.uid as number)) {
-                            return [...prev, user.uid as number];
-                        }
-                        return prev;
-                    });
+                // Event handlers
+                client.on('user-published', async (user, mediaType) => {
+                    console.log('👥 Remote user published:', user.uid, 'Media:', mediaType);
 
-                    // Play remote video
-                    const remoteVideoTrack = user.videoTrack;
-                    const remotePlayerContainer = document.getElementById(
-                        `remote-${user.uid}`
-                    );
-                    if (remoteVideoTrack && remotePlayerContainer) {
-                        remoteVideoTrack.play(remotePlayerContainer);
+                    if (!isMountedRef.current) return;
+
+                    await client.subscribe(user, mediaType);
+                    console.log('✅ Subscribed to remote user:', user.uid);
+
+                    if (mediaType === 'video') {
+                        setRemoteUsers((prev) => {
+                            if (!prev.includes(user.uid as number)) {
+                                console.log('📹 Adding remote video user:', user.uid);
+                                return [...prev, user.uid as number];
+                            }
+                            return prev;
+                        });
+
+                        // Play remote video with retry (wait for DOM to render)
+                        const playRemoteVideo = () => {
+                            const remoteVideoTrack = user.videoTrack;
+                            const remotePlayerContainer = document.getElementById(
+                                `remote-${user.uid}`
+                            );
+
+                            if (remoteVideoTrack && remotePlayerContainer) {
+                                remoteVideoTrack.play(remotePlayerContainer);
+                                console.log('▶️ Playing remote video for user:', user.uid);
+                            } else {
+                                console.warn('⏳ Remote video container not ready, retrying...');
+                                // Retry after a short delay to let React render the element
+                                setTimeout(playRemoteVideo, 100);
+                            }
+                        };
+
+                        // Start playing with a small delay to ensure DOM is ready
+                        setTimeout(playRemoteVideo, 50);
                     }
-                }
 
-                if (mediaType === 'audio') {
-                    const remoteAudioTrack = user.audioTrack;
-                    remoteAudioTrack?.play();
-                }
-            });
+                    if (mediaType === 'audio') {
+                        const remoteAudioTrack = user.audioTrack;
+                        remoteAudioTrack?.play();
+                        console.log('🔊 Playing remote audio for user:', user.uid);
+                    }
+                });
 
-            client.on('user-unpublished', (user, mediaType) => {
-                if (mediaType === 'video') {
+                client.on('user-unpublished', (user, mediaType) => {
+                    console.log('👋 Remote user unpublished:', user.uid, 'Media:', mediaType);
+                    if (mediaType === 'video') {
+                        setRemoteUsers((prev) =>
+                            prev.filter((id) => id !== user.uid)
+                        );
+                    }
+                });
+
+                client.on('user-left', (user) => {
+                    console.log('🚪 Remote user left:', user.uid);
                     setRemoteUsers((prev) =>
                         prev.filter((id) => id !== user.uid)
                     );
-                }
-            });
+                });
 
-            client.on('user-left', (user) => {
-                setRemoteUsers((prev) =>
-                    prev.filter((id) => id !== user.uid)
-                );
-            });
-
-            try {
                 // Join channel
-                await client.join(appId, channelName, token, uid);
+                console.log('🔗 Joining channel:', channelName);
+                console.log('👤 Requesting UID: 0 (auto-generate)');
+                const assignedUid = await client.join(appId, channelName, token, 0);
+                console.log('✅ Successfully joined channel!');
+                console.log('🆔 Assigned UID:', assignedUid);
 
-                // Create and publish local tracks
-                const [audioTrack, videoTrack] =
-                    await AgoraRTC.createMicrophoneAndCameraTracks();
-
-                localAudioTrackRef.current = audioTrack;
-                localVideoTrackRef.current = videoTrack;
-
-                // Play local video
-                if (localVideoRef.current) {
-                    videoTrack.play(localVideoRef.current);
+                if (!isMountedRef.current) {
+                    await client.leave();
+                    return;
                 }
 
-                // Publish tracks
-                await client.publish([audioTrack, videoTrack]);
-                setIsJoined(true);
+                // Create and publish local tracks with fallback
+                try {
+                    // Try to create both camera and microphone
+                    const [audioTrack, videoTrack] =
+                        await AgoraRTC.createMicrophoneAndCameraTracks();
+
+                    if (!isMountedRef.current) {
+                        audioTrack.close();
+                        videoTrack.close();
+                        await client.leave();
+                        return;
+                    }
+
+                    localAudioTrackRef.current = audioTrack;
+                    localVideoTrackRef.current = videoTrack;
+
+                    // Play local video
+                    if (localVideoRef.current) {
+                        videoTrack.play(localVideoRef.current);
+                    }
+
+                    // Publish tracks
+                    await client.publish([audioTrack, videoTrack]);
+                } catch (deviceError: any) {
+                    console.warn('Failed to get camera/microphone:', deviceError);
+
+                    // Fallback: Try audio only
+                    try {
+                        const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+
+                        if (!isMountedRef.current) {
+                            audioTrack.close();
+                            await client.leave();
+                            return;
+                        }
+
+                        localAudioTrackRef.current = audioTrack;
+                        await client.publish([audioTrack]);
+                        console.log('Joined with audio only (no camera available)');
+                    } catch (audioError) {
+                        console.warn('No audio/video devices available:', audioError);
+                        // Join without publishing - can still see/hear remote users
+                    }
+                }
+
+                if (isMountedRef.current) {
+                    setIsJoined(true);
+                }
+
+                isInitializing = false;
             } catch (error) {
                 console.error('Failed to join channel:', error);
+                isInitializing = false;
             }
         };
 
@@ -108,9 +181,27 @@ export default function VideoCallRoom({
 
         // Cleanup
         return () => {
-            localVideoTrackRef.current?.close();
-            localAudioTrackRef.current?.close();
-            clientRef.current?.leave();
+            isMountedRef.current = false;
+
+            // Only cleanup if initialization is complete
+            if (!isInitializing) {
+                const cleanup = async () => {
+                    try {
+                        if (localVideoTrackRef.current) {
+                            localVideoTrackRef.current.close();
+                        }
+                        if (localAudioTrackRef.current) {
+                            localAudioTrackRef.current.close();
+                        }
+                        if (clientRef.current) {
+                            await clientRef.current.leave();
+                        }
+                    } catch (error) {
+                        console.error('Cleanup error:', error);
+                    }
+                };
+                cleanup();
+            }
         };
     }, [appId, channelName, token, uid]);
 
@@ -196,8 +287,8 @@ export default function VideoCallRoom({
                 <button
                     onClick={toggleMute}
                     className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${isMuted
-                            ? 'bg-red-500 hover:bg-red-600'
-                            : 'bg-slate-700 hover:bg-slate-600'
+                        ? 'bg-red-500 hover:bg-red-600'
+                        : 'bg-slate-700 hover:bg-slate-600'
                         }`}
                 >
                     {isMuted ? (
@@ -241,8 +332,8 @@ export default function VideoCallRoom({
                 <button
                     onClick={toggleVideo}
                     className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${isVideoOff
-                            ? 'bg-red-500 hover:bg-red-600'
-                            : 'bg-slate-700 hover:bg-slate-600'
+                        ? 'bg-red-500 hover:bg-red-600'
+                        : 'bg-slate-700 hover:bg-slate-600'
                         }`}
                 >
                     {isVideoOff ? (
