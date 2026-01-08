@@ -12,12 +12,6 @@ export default function Navbar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Hide navbar on auth pages
-    const authRoutes = ['/login', '/register'];
-    if (authRoutes.includes(pathname)) {
-        return null;
-    }
-
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -45,6 +39,12 @@ export default function Navbar() {
             .toUpperCase()
             .slice(0, 2);
     };
+
+    // Hide navbar on auth pages
+    const authRoutes = ['/login', '/register'];
+    if (authRoutes.includes(pathname)) {
+        return null;
+    }
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
