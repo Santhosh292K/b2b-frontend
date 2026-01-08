@@ -13,7 +13,6 @@ export default function Navbar() {
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Close dropdown when clicking outside
-    // NOTE: This hook MUST be before any conditional returns (Rules of Hooks)
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -25,8 +24,8 @@ export default function Navbar() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Hide navbar on auth pages
-    const authRoutes = ['/login', '/register'];
+    // Hide navbar on auth pages and landing page
+    const authRoutes = ['/login', '/register', '/'];
     if (authRoutes.includes(pathname)) {
         return null;
     }
@@ -48,7 +47,7 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
                     {/* Logo */}
@@ -56,25 +55,25 @@ export default function Navbar() {
                         href="/"
                         className="flex items-center gap-2"
                     >
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center">
                             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
                         </div>
-                        <span className="text-xl font-bold text-slate-800">AuthApp</span>
+                        <span className="text-xl font-bold text-slate-800">MedConnect</span>
                     </Link>
 
                     {/* Right side */}
                     <div className="flex items-center gap-4">
                         {isLoading ? (
-                            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                            <div className="w-5 h-5 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" />
                         ) : isAuthenticated ? (
                             <>
                                 {/* Navigation Links */}
                                 <Link
                                     href="/dashboard"
                                     className={`hidden sm:block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === '/dashboard'
-                                        ? 'bg-blue-50 text-blue-700'
+                                        ? 'bg-violet-50 text-violet-700'
                                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                                         }`}
                                 >
@@ -99,7 +98,7 @@ export default function Navbar() {
                                         <Link
                                             href="/doctor/patients"
                                             className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname.startsWith('/doctor/patients')
-                                                ? 'bg-blue-50 text-blue-700'
+                                                ? 'bg-violet-50 text-violet-700'
                                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                                                 }`}
                                         >
@@ -131,10 +130,10 @@ export default function Navbar() {
                                 <div className="relative" ref={dropdownRef}>
                                     <button
                                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                        className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                        className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                                     >
                                         {/* Avatar */}
-                                        <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm">
+                                        <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm">
                                             {user?.name ? getInitials(user.name) : 'U'}
                                         </div>
                                         {/* Dropdown Arrow */}
@@ -212,7 +211,7 @@ export default function Navbar() {
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                                    className="px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors shadow-sm"
                                 >
                                     Get Started
                                 </Link>
