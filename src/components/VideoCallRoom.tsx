@@ -38,19 +38,28 @@ export default function VideoCallRoom({
 
         const init = async () => {
             try {
+                console.log('🎥 Initializing video call...');
+                console.log('📍 Channel:', channelName);
+                console.log('👤 User ID:', uid);
+                console.log('🔑 App ID:', appId);
+
                 // Create Agora client
                 const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
                 clientRef.current = client;
 
                 // Event handlers
                 client.on('user-published', async (user, mediaType) => {
+                    console.log('👥 Remote user published:', user.uid, 'Media:', mediaType);
+
                     if (!isMountedRef.current) return;
 
                     await client.subscribe(user, mediaType);
+                    console.log('✅ Subscribed to remote user:', user.uid);
 
                     if (mediaType === 'video') {
                         setRemoteUsers((prev) => {
                             if (!prev.includes(user.uid as number)) {
+                                console.log('📹 Adding remote video user:', user.uid);
                                 return [...prev, user.uid as number];
                             }
                             return prev;
@@ -63,16 +72,19 @@ export default function VideoCallRoom({
                         );
                         if (remoteVideoTrack && remotePlayerContainer) {
                             remoteVideoTrack.play(remotePlayerContainer);
+                            console.log('▶️ Playing remote video for user:', user.uid);
                         }
                     }
 
                     if (mediaType === 'audio') {
                         const remoteAudioTrack = user.audioTrack;
                         remoteAudioTrack?.play();
+                        console.log('🔊 Playing remote audio for user:', user.uid);
                     }
                 });
 
                 client.on('user-unpublished', (user, mediaType) => {
+                    console.log('👋 Remote user unpublished:', user.uid, 'Media:', mediaType);
                     if (mediaType === 'video') {
                         setRemoteUsers((prev) =>
                             prev.filter((id) => id !== user.uid)
@@ -81,13 +93,18 @@ export default function VideoCallRoom({
                 });
 
                 client.on('user-left', (user) => {
+                    console.log('🚪 Remote user left:', user.uid);
                     setRemoteUsers((prev) =>
                         prev.filter((id) => id !== user.uid)
                     );
                 });
 
                 // Join channel
-                await client.join(appId, channelName, token, uid);
+                console.log('🔗 Joining channel:', channelName);
+                console.log('👤 Requesting UID: 0 (auto-generate)');
+                const assignedUid = await client.join(appId, channelName, token, 0);
+                console.log('✅ Successfully joined channel!');
+                console.log('🆔 Assigned UID:', assignedUid);
 
                 if (!isMountedRef.current) {
                     await client.leave();
