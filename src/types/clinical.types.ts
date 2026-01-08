@@ -73,3 +73,40 @@ export interface AISearchResponse {
         query: string;
     };
 }
+
+// Appointment Types
+export interface Appointment {
+    _id: string;
+    patientId: string;
+    patientName: string;
+    patientEmail?: string;
+    doctorId: string;
+    doctorName: string;
+    status: 'pending' | 'accepted' | 'rejected';
+    requestedDate: string;
+    message: string;
+    createdAt: string;
+}
+
+export interface AppointmentListResponse {
+    success: boolean;
+    data: {
+        appointments: Appointment[];
+        total: number;
+        pendingCount?: number;
+    };
+}
+
+export interface AppointmentDetailResponse {
+    success: boolean;
+    data: {
+        appointment: Appointment;
+    };
+}
+
+export interface PendingCountResponse {
+    success: boolean;
+    data: {
+        count: number;
+    };
+}

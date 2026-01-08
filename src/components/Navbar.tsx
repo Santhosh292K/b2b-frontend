@@ -12,13 +12,8 @@ export default function Navbar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Hide navbar on auth pages
-    const authRoutes = ['/login', '/register'];
-    if (authRoutes.includes(pathname)) {
-        return null;
-    }
-
     // Close dropdown when clicking outside
+    // NOTE: This hook MUST be before any conditional returns (Rules of Hooks)
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -29,6 +24,12 @@ export default function Navbar() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Hide navbar on auth pages
+    const authRoutes = ['/login', '/register'];
+    if (authRoutes.includes(pathname)) {
+        return null;
+    }
 
     const handleLogout = async () => {
         setIsDropdownOpen(false);
@@ -73,12 +74,58 @@ export default function Navbar() {
                                 <Link
                                     href="/dashboard"
                                     className={`hidden sm:block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === '/dashboard'
-                                            ? 'bg-blue-50 text-blue-700'
-                                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                        ? 'bg-blue-50 text-blue-700'
+                                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                                         }`}
                                 >
                                     Dashboard
                                 </Link>
+
+                                {/* Doctor-specific links */}
+                                {user?.role === 'doctor' && (
+                                    <>
+                                        <Link
+                                            href="/doctor/appointments"
+                                            className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === '/doctor/appointments'
+                                                ? 'bg-amber-50 text-amber-700'
+                                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                                }`}
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            Appointments
+                                        </Link>
+                                        <Link
+                                            href="/doctor/patients"
+                                            className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname.startsWith('/doctor/patients')
+                                                ? 'bg-blue-50 text-blue-700'
+                                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                                }`}
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            Patients
+                                        </Link>
+                                    </>
+                                )}
+
+                                {/* Patient-specific links */}
+                                {user?.role === 'patient' && (
+                                    <Link
+                                        href="/patient/book-appointment"
+                                        className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname === '/patient/book-appointment'
+                                            ? 'bg-emerald-50 text-emerald-700'
+                                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                            }`}
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Book Appointment
+                                    </Link>
+                                )}
 
                                 {/* Profile Dropdown */}
                                 <div className="relative" ref={dropdownRef}>

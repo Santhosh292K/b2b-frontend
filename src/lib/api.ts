@@ -87,7 +87,7 @@ export default api;
 
 // Auth API functions
 export const authApi = {
-    register: (data: { name: string; email: string; password: string }) =>
+    register: (data: { name: string; email: string; password: string; role: 'doctor' | 'patient' }) =>
         api.post('/api/auth/register', data),
 
     login: (data: { email: string; password: string }) =>
@@ -142,4 +142,35 @@ export const visitApi = {
             patientId,
             query,
         }),
+};
+
+// Appointment API functions
+export const appointmentApi = {
+    // Create appointment request (patient only)
+    createAppointment: (doctorId: string, requestedDate: string, message?: string) =>
+        api.post('/api/appointments', { doctorId, requestedDate, message }),
+
+    // Get doctor's appointments (doctor only)
+    getDoctorAppointments: (status?: string) =>
+        api.get<{ success: boolean; data: { appointments: Array<{ _id: string; patientId: string; patientName: string; patientEmail: string; doctorId: string; doctorName: string; status: string; requestedDate: string; message: string; createdAt: string }>; total: number; pendingCount: number } }>(
+            `/api/appointments/doctor${status ? `?status=${status}` : ''}`
+        ),
+
+    // Get patient's appointments (patient only)
+    getPatientAppointments: () =>
+        api.get<{ success: boolean; data: { appointments: Array<{ _id: string; patientId: string; patientName: string; doctorId: string; doctorName: string; status: string; requestedDate: string; message: string; createdAt: string }>; total: number } }>(
+            '/api/appointments/patient'
+        ),
+
+    // Accept appointment (doctor only)
+    acceptAppointment: (appointmentId: string) =>
+        api.put(`/api/appointments/${appointmentId}/accept`),
+
+    // Reject appointment (doctor only)
+    rejectAppointment: (appointmentId: string) =>
+        api.put(`/api/appointments/${appointmentId}/reject`),
+
+    // Get pending count for badge (doctor only)
+    getPendingCount: () =>
+        api.get<{ success: boolean; data: { count: number } }>('/api/appointments/doctor/count'),
 };

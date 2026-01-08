@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function RegisterPage() {
     const [name, setName] = useState('');
@@ -56,7 +56,7 @@ export default function RegisterPage() {
         setIsSubmitting(true);
 
         try {
-            await register({ name, email, password, role });
+            await register({ name, email, password, role: role as 'doctor' | 'patient' });
             router.replace('/dashboard');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Registration failed');
@@ -131,8 +131,8 @@ export default function RegisterPage() {
                                     type="button"
                                     onClick={() => setRole('doctor')}
                                     className={`p-4 rounded-xl border-2 transition-all duration-200 ${role === 'doctor'
-                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                        : 'border-slate-200 hover:border-slate-300 text-slate-600'
                                         }`}
                                 >
                                     <div className="flex flex-col items-center gap-2">
@@ -146,8 +146,8 @@ export default function RegisterPage() {
                                     type="button"
                                     onClick={() => setRole('patient')}
                                     className={`p-4 rounded-xl border-2 transition-all duration-200 ${role === 'patient'
-                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                        : 'border-slate-200 hover:border-slate-300 text-slate-600'
                                         }`}
                                 >
                                     <div className="flex flex-col items-center gap-2">
