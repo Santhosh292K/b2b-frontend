@@ -65,15 +65,25 @@ export default function VideoCallRoom({
                             return prev;
                         });
 
-                        // Play remote video
-                        const remoteVideoTrack = user.videoTrack;
-                        const remotePlayerContainer = document.getElementById(
-                            `remote-${user.uid}`
-                        );
-                        if (remoteVideoTrack && remotePlayerContainer) {
-                            remoteVideoTrack.play(remotePlayerContainer);
-                            console.log('▶️ Playing remote video for user:', user.uid);
-                        }
+                        // Play remote video with retry (wait for DOM to render)
+                        const playRemoteVideo = () => {
+                            const remoteVideoTrack = user.videoTrack;
+                            const remotePlayerContainer = document.getElementById(
+                                `remote-${user.uid}`
+                            );
+
+                            if (remoteVideoTrack && remotePlayerContainer) {
+                                remoteVideoTrack.play(remotePlayerContainer);
+                                console.log('▶️ Playing remote video for user:', user.uid);
+                            } else {
+                                console.warn('⏳ Remote video container not ready, retrying...');
+                                // Retry after a short delay to let React render the element
+                                setTimeout(playRemoteVideo, 100);
+                            }
+                        };
+
+                        // Start playing with a small delay to ensure DOM is ready
+                        setTimeout(playRemoteVideo, 50);
                     }
 
                     if (mediaType === 'audio') {
