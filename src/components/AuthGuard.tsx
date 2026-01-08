@@ -16,7 +16,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         if (!isLoading && !isAuthenticated) {
             router.push('/login');
         }
-    }, [isAuthenticated, isLoading, router]);
+    }, [isAuthenticated, isLoading]);
 
     if (isLoading) {
         return (

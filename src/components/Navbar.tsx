@@ -47,6 +47,12 @@ export default function Navbar() {
             .slice(0, 2);
     };
 
+    // Hide navbar on auth pages
+    const authRoutes = ['/login', '/register'];
+    if (authRoutes.includes(pathname)) {
+        return null;
+    }
+
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
