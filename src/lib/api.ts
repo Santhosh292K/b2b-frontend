@@ -101,13 +101,13 @@ export const authApi = {
 
     getMe: () => api.get("/api/auth/me"),
 
-  logoutAll: () => api.post("/api/auth/logout-all"),
+    logoutAll: () => api.post("/api/auth/logout-all"),
 
-  updateProfile: (data: { name: string; email: string }) =>
-    api.put("/api/auth/profile", data),
+    updateProfile: (data: { name: string; email: string }) =>
+        api.put("/api/auth/profile", data),
 
-  changePassword: (data: { currentPassword: string; newPassword: string }) =>
-    api.put("/api/auth/change-password", data),
+    changePassword: (data: { currentPassword: string; newPassword: string }) =>
+        api.put("/api/auth/change-password", data),
 };
 
 // Clinical Visit API functions
@@ -236,85 +236,85 @@ export const appointmentApi = {
         ),
 };
 export const medicalHistoryApi = {
-  getMedicalHistory: (patientId?: string) =>
-    api.get("/api/medical-history", { params: { patientId } }),
+    getMedicalHistory: (patientId?: string) =>
+        api.get("/api/medical-history", { params: { patientId } }),
 
-  addMedicalHistoryEvent: (data: {
-    patientId: string;
-    condition: {
-      name: string;
-      type: string;
-      severity: string;
-      description?: string;
-    };
-    diagnosedOn: string;
-    diagnosedBy?: {
-      doctorId: string;
-      doctorName: string;
-      hospital?: string;
-    };
-    affectedBodyPart?: string;
-    treatments?: Array<{
-      treatmentId: string;
-      type: string;
-      details: Record<string, string>;
-      startedOn: string;
-      endedOn?: string;
-    }>;
-    followUps?: Array<{
-      date: string;
-      notes: string;
-      nextVisit?: string;
-    }>;
-    status?: string;
-    documents?: Array<{
-      type: string;
-      url: string;
-    }>;
-  }) => api.post("/api/medical-history", data),
+    addMedicalHistoryEvent: (data: {
+        patientId: string;
+        condition: {
+            name: string;
+            type: string;
+            severity: string;
+            description?: string;
+        };
+        diagnosedOn: string;
+        diagnosedBy?: {
+            doctorId: string;
+            doctorName: string;
+            hospital?: string;
+        };
+        affectedBodyPart?: string;
+        treatments?: Array<{
+            treatmentId: string;
+            type: string;
+            details: Record<string, string>;
+            startedOn: string;
+            endedOn?: string;
+        }>;
+        followUps?: Array<{
+            date: string;
+            notes: string;
+            nextVisit?: string;
+        }>;
+        status?: string;
+        documents?: Array<{
+            type: string;
+            url: string;
+        }>;
+    }) => api.post("/api/medical-history", data),
 
-  updateMedicalHistoryEvent: (
-    eventId: string,
-    data: {
-      patientId: string;
-      condition?: {
-        name: string;
-        type: string;
-        severity: string;
-        description?: string;
-      };
-      diagnosedOn?: string;
-      diagnosedBy?: {
-        doctorId: string;
-        doctorName: string;
-        hospital?: string;
-      };
-      affectedBodyPart?: string;
-      treatments?: Array<{
-        treatmentId: string;
-        type: string;
-        details: Record<string, string>;
-        startedOn: string;
-        endedOn?: string;
-      }>;
-      followUps?: Array<{
-        date: string;
-        notes: string;
-        nextVisit?: string;
-      }>;
-      status?: string;
-      documents?: Array<{
-        type: string;
-        url: string;
-      }>;
-    }
-  ) => api.put(`/api/medical-history/${eventId}`, data),
+    updateMedicalHistoryEvent: (
+        eventId: string,
+        data: {
+            patientId: string;
+            condition?: {
+                name: string;
+                type: string;
+                severity: string;
+                description?: string;
+            };
+            diagnosedOn?: string;
+            diagnosedBy?: {
+                doctorId: string;
+                doctorName: string;
+                hospital?: string;
+            };
+            affectedBodyPart?: string;
+            treatments?: Array<{
+                treatmentId: string;
+                type: string;
+                details: Record<string, string>;
+                startedOn: string;
+                endedOn?: string;
+            }>;
+            followUps?: Array<{
+                date: string;
+                notes: string;
+                nextVisit?: string;
+            }>;
+            status?: string;
+            documents?: Array<{
+                type: string;
+                url: string;
+            }>;
+        }
+    ) => api.put(`/api/medical-history/${eventId}`, data),
 
-  deleteMedicalHistoryEvent: (eventId: string, patientId: string) =>
-    api.delete(`/api/medical-history/${eventId}`, { data: { patientId } }),
+    deleteMedicalHistoryEvent: (eventId: string, patientId: string) =>
+        api.delete(`/api/medical-history/${eventId}`, { data: { patientId } }),
 
-  getMedicalHistoryEvent: (eventId: string, patientId?: string) =>
-    api.get(`/api/medical-history/${eventId}`, { params: { patientId } }),
+    getMedicalHistoryEvent: (eventId: string, patientId?: string) =>
+        api.get(`/api/medical-history/${eventId}`, { params: { patientId } }),
 };
 
 // Chat session types
@@ -362,4 +362,50 @@ export const chatApi = {
     // Delete a chat session
     deleteSession: (sessionId: string) =>
         api.delete(`/api/chat/sessions/${sessionId}`),
+};
+
+// Video Call API functions
+export const videoCallApi = {
+    // Generate Agora token for video call
+    generateToken: (appointmentId: string) =>
+        api.post<{
+            success: boolean;
+            data: {
+                token: string;
+                channelName: string;
+                appId: string;
+                uid: string;
+                videoCallId: string;
+            };
+        }>('/api/video-calls/generate-token', { appointmentId }),
+
+    // Start video call
+    startCall: (videoCallId: string) =>
+        api.post<{
+            success: boolean;
+            message: string;
+            data: { videoCall: any };
+        }>('/api/video-calls/start', { videoCallId }),
+
+    // End video call
+    endCall: (videoCallId: string) =>
+        api.put<{
+            success: boolean;
+            message: string;
+            data: { videoCall: any };
+        }>(`/api/video-calls/${videoCallId}/end`),
+
+    // Get video call by appointment ID
+    getCallByAppointment: (appointmentId: string) =>
+        api.get<{
+            success: boolean;
+            data: { videoCall: any };
+        }>(`/api/video-calls/appointment/${appointmentId}`),
+
+    // Get call history
+    getCallHistory: () =>
+        api.get<{
+            success: boolean;
+            data: { videoCalls: any[]; total: number };
+        }>('/api/video-calls/history'),
 };

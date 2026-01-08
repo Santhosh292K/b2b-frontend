@@ -4,6 +4,7 @@ import AuthGuard from '@/components/AuthGuard';
 import { useState, useEffect } from 'react';
 import { appointmentApi } from '@/lib/api';
 import Link from 'next/link';
+import StartVideoCallButton from '@/components/StartVideoCallButton';
 
 interface Appointment {
     _id: string;
@@ -157,9 +158,17 @@ export default function MyAppointmentsPage() {
                                                 </span>
 
                                                 {appointment.message && (
-                                                    <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-100 w-full line-clamp-2">
+                                                    <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-100 w-full line-clamp-2 mb-3">
                                                         {appointment.message}
                                                     </p>
+                                                )}
+
+                                                {appointment.status === 'accepted' && (
+                                                    <StartVideoCallButton
+                                                        appointmentId={appointment._id}
+                                                        status={appointment.status}
+                                                        className="w-full text-sm"
+                                                    />
                                                 )}
                                             </div>
                                         </div>

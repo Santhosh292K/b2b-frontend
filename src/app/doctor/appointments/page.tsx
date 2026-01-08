@@ -5,6 +5,7 @@ import { appointmentApi } from '@/lib/api';
 import AuthGuard from '@/components/AuthGuard';
 import RoleGuard from '@/components/RoleGuard';
 import Link from 'next/link';
+import StartVideoCallButton from '@/components/StartVideoCallButton';
 
 interface Appointment {
     _id: string;
@@ -215,6 +216,16 @@ export default function DoctorAppointmentsPage() {
                                                             </svg>
                                                             Reject
                                                         </button>
+                                                    </div>
+                                                )}
+
+                                                {apt.status === 'accepted' && (
+                                                    <div className="pt-4 border-t border-slate-100">
+                                                        <StartVideoCallButton
+                                                            appointmentId={apt._id}
+                                                            status={apt.status}
+                                                            className="w-full"
+                                                        />
                                                     </div>
                                                 )}
                                             </div>
