@@ -174,3 +174,50 @@ export const appointmentApi = {
     getPendingCount: () =>
         api.get<{ success: boolean; data: { count: number } }>('/api/appointments/doctor/count'),
 };
+
+// Chat session types
+interface ChatSession {
+    _id: string;
+    patientId: string;
+    patientName: string;
+    title: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface ChatMessage {
+    _id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    createdAt: string;
+}
+
+// Chat API functions
+export const chatApi = {
+    // Get available patients for chat (doctor only)
+    getAvailablePatients: () =>
+        api.get<{ success: boolean; data: { patients: Array<{ _id: string; name: string; email: string }>; total: number } }>('/api/chat/patients'),
+
+    // Create a new chat session
+    createSession: (patientId?: string) =>
+        api.post<{ success: boolean; data: { session: ChatSession } }>('/api/chat/sessions', { patientId }),
+
+    // Get user's chat sessions
+    getSessions: () =>
+        api.get<{ success: boolean; data: { sessions: ChatSession[]; total: number } }>('/api/chat/sessions'),
+
+    // Get messages for a session
+    getMessages: (sessionId: string) =>
+        api.get<{ success: boolean; data: { messages: ChatMessage[] } }>(`/api/chat/sessions/${sessionId}/messages`),
+
+    // Send a message and get AI response
+    sendMessage: (sessionId: string, message: string) =>
+        api.post<{ success: boolean; data: { userMessage: ChatMessage; assistantMessage: ChatMessage } }>(
+            `/api/chat/sessions/${sessionId}/messages`,
+            { message }
+        ),
+
+    // Delete a chat session
+    deleteSession: (sessionId: string) =>
+        api.delete(`/api/chat/sessions/${sessionId}`),
+};
